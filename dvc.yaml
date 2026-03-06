@@ -1,0 +1,80 @@
+stages:
+
+  data_ingestion:
+    cmd: python -m src.data_ingestion
+    deps:
+      - src/data_ingestion.py
+      - src/log_config.py
+    params:
+      - params.yaml:
+          - data_ingestion.url
+          - data_ingestion.raw_data_path
+    outs:
+      - data/raw/titanic.csv
+
+  data_preprocessing:
+    cmd: python -m src.data_preprocessing
+    deps:
+      - src/data_preprocessing.py
+      - src/log_config.py
+      - data/raw/titanic.csv
+    params:
+      - params.yaml:
+          - data_preprocessing.processed_data_path
+          - data_preprocessing.test_size
+          - data_preprocessing.random_state
+          - data_preprocessing.drop_columns
+    outs:
+      - data/processed/titanic_processed.csv
+
+  model_training:
+    cmd: python -m src.model_training
+    deps:
+      - src/model_training.py
+      - src/log_config.py
+      - data/processed/titanic_processed.csv
+    params:
+      - params.yaml:
+          - model_training.n_estimators
+          - model_training.max_depth
+          - model_training.min_samples_split
+          - model_training.min_samples_leaf
+          - model_training.random_state
+          - model_training.model_path
+          - data_preprocessing.test_size
+          - data_preprocessing.random_state
+    outs:
+      - models/model.pkl
+
+  model_evaluation:
+    cmd: python -m src.model_evaluation
+    deps:
+      - src/model_evaluation.py
+      - src/log_config.py
+      - data/processed/titanic_processed.csv
+      - models/model.pkl
+    params:
+      - params.yaml:
+          - model_evaluation.test_size
+          - model_evaluation.random_state
+          - model_evaluation.metrics_path
+    metrics:
+      - model_config/metrics.json:
+          cache: false
+
+  model_config:
+    cmd: python -m src.model_config
+    deps:
+      - src/model_config.py
+      - src/log_config.py
+      - models/model.pkl
+      - model_config/metrics.json
+    params:
+      - params.yaml:
+          - model_config.model_params_path
+          - model_config.model_report_path
+    outs:
+      - model_config/model_params.json:
+          cache: false
+      - model_config/model_report.yaml:
+          cache: false

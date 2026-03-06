@@ -1,0 +1,35 @@
+# ──────────────────────────────────────────────
+#  params.yaml  –  Pipeline hyper-parameters
+# ──────────────────────────────────────────────
+
+data_ingestion:
+  url: "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+  raw_data_path: "data/raw/titanic.csv"
+
+data_preprocessing:
+  processed_data_path: "data/processed/titanic_processed.csv"
+  test_size: 0.2
+  random_state: 42
+  target_column: "Survived"
+  drop_columns:
+    - "PassengerId"
+    - "Name"
+    - "Ticket"
+    - "Cabin"
+
+model_training:
+  model_path: "models/model.pkl"
+  random_state: 42
+  n_estimators: 100
+  max_depth: 6
+  min_samples_split: 2
+  min_samples_leaf: 1
+
+model_evaluation:
+  metrics_path: "model_config/metrics.json"
+  test_size: 0.2
+  random_state: 42
+
+model_config:
+  model_params_path: "model_config/model_params.json"
+  model_report_path: "model_config/model_report.yaml"
